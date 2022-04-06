@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+	<head>
+		<title>L.ImageOverlay.ColorPicker example</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+		<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+		<script src="leaflet-imageoverlay-colorpicker.js"></script>
+		<style>
+			#map_div {
+				width: 800px;
+				height: 600px;
+			}
+
+		</style>
+	</head>
+	<body>
+		<h1>L.ImageOverlay.ColorPicker example</h1>
+		<div id="map_div"></div>
+		<script>
+			const map=L.map('map_div').fitBounds([[35.3326,35.6796],[35.9008,36.2270]]);
+			const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+			}).addTo(map);
+            const l=L.imageOverlay.colorPicker('L_2000.png',[[35.3326,35.6796],[35.9008,36.2270]]).addTo(map);
+            var tooltip;
+            
+            map.on('mousemove',e=>{
+                let rgb=l.getColor(e.latlng); // pick color at mouse position
+                if (tooltip) tooltip.remove(); // remove previous tooltip
+                if (rgb===null||rgb[3]==0) return; // no data or totally transparent
+                rgb=rgb.slice(0,3); // drop opacity
+                let b=(rgb[0]+rgb[1]*2+rgb[2])/1020; // calculate brightness
+                let tc=b>.35?'#000':'#fff'; // black/white text color depends on background color brightness 
+                // tooltip content
+                let content='<span style="padding:5px;border-radius:5px;background:rgb('+rgb+');color:'+tc+'">'+rgb+'</span><br/>';
+                // display tooltip
+                tooltip=L.tooltip({opacity:1}).setLatLng(e.latlng)
+                    .setContent(content)
+                    .addTo(map);
+            });
+		</script>
+	</body>
+</html>
