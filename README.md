@@ -14,3 +14,6 @@ map.on('click',e=>{
     console.log(rgb);
 });
 ```
+
+## Online demo
+https://samanbey.github.io/leaflet-imageoverlay-colorpicker/

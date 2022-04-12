@@ -28,5 +28,5 @@
             return rgb;
         }
     });
-    L.imageOverlay.colorPicker=(url, opts)=>(new L.ImageOverlay.ColorPicker(url, opts));
+    L.imageOverlay.colorPicker=(url, bbox, opts)=>(new L.ImageOverlay.ColorPicker(url, bbox, opts));
 })();

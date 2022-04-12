@@ -11,7 +11,9 @@
 				width: 800px;
 				height: 600px;
 			}
-
+            .leaflet-image-layer {
+                image-rendering: pixelated;
+            }
 		</style>
 	</head>
 	<body>
@@ -22,22 +24,34 @@
 			const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 			}).addTo(map);
-            const l=L.imageOverlay.colorPicker('L_2000.png',[[35.3326,35.6796],[35.9008,36.2270]]).addTo(map);
-            var tooltip;
+            const l=L.imageOverlay.colorPicker('L_2000.png',
+                [[35.3326,35.6796],[35.9008,36.2270]],
+                {  }).addTo(map);
             
+            // Displaying a tooltip with the pixel color under the pointer.
+            // (Traditional layer.bindTooltip does not work well because 
+            // tooltip content is not updated when the pointer moves.)
             map.on('mousemove',e=>{
                 let rgb=l.getColor(e.latlng); // pick color at mouse position
-                if (tooltip) tooltip.remove(); // remove previous tooltip
-                if (rgb===null||rgb[3]==0) return; // no data or totally transparent
+                if (rgb==null||rgb[3]==0) {  // close tooltip if no data or totally transparent
+                    l.closeTooltip();
+                    return;
+                }
                 rgb=rgb.slice(0,3); // drop opacity
                 let b=(rgb[0]+rgb[1]*2+rgb[2])/1020; // calculate brightness
                 let tc=b>.35?'#000':'#fff'; // black/white text color depends on background color brightness 
                 // tooltip content
                 let content='<span style="padding:5px;border-radius:5px;background:rgb('+rgb+');color:'+tc+'">'+rgb+'</span><br/>';
-                // display tooltip
-                tooltip=L.tooltip({opacity:1}).setLatLng(e.latlng)
+                // create tooltip if necessary
+                if (!l.getTooltip()) 
+                    l.bindTooltip(content,{opacity:1});
+                // set tooltip content and position
+                l.getTooltip().setLatLng(e.latlng)
                     .setContent(content)
                     .addTo(map);
+            });
+            map.on('mouseout',e=>{
+                l.closeTooltip();
             });
 		</script>
 	</body>
